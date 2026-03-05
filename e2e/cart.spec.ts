@@ -51,9 +51,8 @@ test.describe('Add to cart flow', () => {
 
     // Select first available size
     const sizeButton = page.getByRole('button').filter({ hasText: /UK \d+/i }).first();
-    if (await sizeButton.isVisible()) {
-      await sizeButton.click();
-    }
+    await expect(sizeButton).toBeVisible();
+    await sizeButton.click();
 
     const addBtn = page.getByRole('button', { name: /Add to Cart/i });
     await expect(addBtn).toBeEnabled();
@@ -74,9 +73,8 @@ test.describe('Add to cart flow', () => {
     await page.goto('/products/luna-comfort-slip');
 
     const sizeButton = page.getByRole('button').filter({ hasText: /UK \d+/i }).first();
-    if (await sizeButton.isVisible()) {
-      await sizeButton.click();
-    }
+    await expect(sizeButton).toBeVisible();
+    await sizeButton.click();
 
     const addBtn = page.getByRole('button', { name: /Add to Cart/i });
     await expect(addBtn).toBeEnabled();
@@ -99,9 +97,8 @@ test.describe('Add to cart flow', () => {
     await page.goto('/products/apex-runner-pro');
 
     const sizeButton = page.getByRole('button').filter({ hasText: /UK \d+/i }).first();
-    if (await sizeButton.isVisible()) {
-      await sizeButton.click();
-    }
+    await expect(sizeButton).toBeVisible();
+    await sizeButton.click();
 
     await page.getByRole('button', { name: /Add to Cart/i }).click();
     await page.waitForTimeout(1500);

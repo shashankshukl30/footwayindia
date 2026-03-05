@@ -6,8 +6,9 @@ test.describe('Homepage', () => {
   });
 
   test('renders announcement bar with free shipping text', async ({ page }) => {
-    // The bar rotates through messages — check at least one is visible on load
-    await expect(page.getByText(/Free Shipping/i)).toBeVisible();
+    // Scope to the gold announcement bar element to avoid matching hero section text
+    const bar = page.locator('div.bg-brand-gold').first();
+    await expect(bar.getByText(/Free Shipping/i)).toBeVisible();
   });
 
   test('renders hero headline', async ({ page }) => {
@@ -47,6 +48,13 @@ test.describe('Homepage', () => {
     const logo = page.getByRole('link', { name: /FOOTWAY INDIA/i }).first();
     await expect(logo).toBeVisible();
     await expect(logo).toHaveAttribute('href', '/');
+  });
+
+  test('navbar links point to correct collections', async ({ page }) => {
+    const nav = page.getByRole('navigation');
+    await expect(nav.getByRole('link', { name: "Men's" })).toHaveAttribute('href', '/collections/mens');
+    await expect(nav.getByRole('link', { name: "Women's" })).toHaveAttribute('href', '/collections/womens');
+    await expect(nav.getByRole('link', { name: 'Kids' })).toHaveAttribute('href', '/collections/kids');
   });
 
   test('footer shows trust badges', async ({ page }) => {

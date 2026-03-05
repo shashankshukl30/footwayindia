@@ -30,9 +30,8 @@ test.describe('Collection pages', () => {
 
   test('unknown collection shows 404', async ({ page }) => {
     await page.goto('/collections/does-not-exist');
-    // Next.js notFound() renders a 404 page
-    await expect(page).toHaveURL(/does-not-exist/);
-    // Should not crash — just show not found
+    // Next.js notFound() renders a 404 page with "Not Found" heading
+    await expect(page.getByRole('heading', { name: /not found/i })).toBeVisible();
   });
 });
 
@@ -64,8 +63,8 @@ test.describe('Product Detail Page', () => {
 
   test('unknown product shows 404', async ({ page }) => {
     await page.goto('/products/this-does-not-exist');
-    // notFound() should be called
-    await expect(page.locator('body')).toBeVisible();
+    // Next.js notFound() renders a 404 page with "Not Found" heading
+    await expect(page.getByRole('heading', { name: /not found/i })).toBeVisible();
   });
 });
 

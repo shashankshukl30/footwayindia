@@ -7,9 +7,10 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Cart page', () => {
   test('empty cart shows empty state', async ({ page }) => {
-    // Clear cart storage before test
+    // Clear all storage and reload so Zustand re-hydrates with null cartId
     await page.goto('/');
-    await page.evaluate(() => localStorage.removeItem('footway-cart'));
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
 
     await page.goto('/cart');
     await expect(page.getByText(/cart is empty/i)).toBeVisible();
@@ -19,9 +20,10 @@ test.describe('Cart page', () => {
 
 test.describe('Add to cart flow', () => {
   test.beforeEach(async ({ page }) => {
-    // Clear cart state
+    // Clear all storage and reload so Zustand re-hydrates with null cartId
     await page.goto('/');
-    await page.evaluate(() => localStorage.removeItem('footway-cart'));
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
   });
 
   test('can select size and add product to cart', async ({ page }) => {
@@ -35,12 +37,13 @@ test.describe('Add to cart flow', () => {
     // Add to cart button should now be active
     const addBtn = page.getByRole('button', { name: /Add to Cart/i });
     await expect(addBtn).toBeEnabled();
-    await addBtn.click();
 
-    // Should navigate/open cart — check that cart has item
-    await page.waitForTimeout(1500); // Allow cart API call to complete
+    // Wait for the cart API response before navigating
+    await Promise.all([
+      page.waitForResponse((r) => r.url().includes('/api/cart') && r.status() === 200),
+      addBtn.click(),
+    ]);
 
-    // Cart icon in navbar should show count or cart opens
     // Navigate to cart page to verify
     await page.goto('/cart');
     await expect(page.getByText('Apex Runner Pro')).toBeVisible();
@@ -56,9 +59,11 @@ test.describe('Add to cart flow', () => {
 
     const addBtn = page.getByRole('button', { name: /Add to Cart/i });
     await expect(addBtn).toBeEnabled();
-    await addBtn.click();
 
-    await page.waitForTimeout(1500);
+    await Promise.all([
+      page.waitForResponse((r) => r.url().includes('/api/cart') && r.status() === 200),
+      addBtn.click(),
+    ]);
 
     // Navigate to homepage and back to cart
     await page.goto('/');
@@ -78,16 +83,21 @@ test.describe('Add to cart flow', () => {
 
     const addBtn = page.getByRole('button', { name: /Add to Cart/i });
     await expect(addBtn).toBeEnabled();
-    await addBtn.click();
-    await page.waitForTimeout(1500);
+
+    await Promise.all([
+      page.waitForResponse((r) => r.url().includes('/api/cart') && r.status() === 200),
+      addBtn.click(),
+    ]);
 
     await page.goto('/cart');
     await expect(page.getByText('Luna Comfort Slip')).toBeVisible();
 
     // Remove the item
     const removeBtn = page.getByRole('button', { name: /Remove Luna Comfort Slip from cart/i });
-    await removeBtn.click();
-    await page.waitForTimeout(1500);
+    await Promise.all([
+      page.waitForResponse((r) => r.url().includes('/api/cart') && r.status() === 200),
+      removeBtn.click(),
+    ]);
 
     // Cart should be empty
     await expect(page.getByText(/cart is empty/i)).toBeVisible();
@@ -100,8 +110,11 @@ test.describe('Add to cart flow', () => {
     await expect(sizeButton).toBeVisible();
     await sizeButton.click();
 
-    await page.getByRole('button', { name: /Add to Cart/i }).click();
-    await page.waitForTimeout(1500);
+    await Promise.all([
+      page.waitForResponse((r) => r.url().includes('/api/cart') && r.status() === 200),
+      page.getByRole('button', { name: /Add to Cart/i }).click(),
+    ]);
+
     await page.goto('/cart');
 
     const checkoutBtn = page.getByRole('link', { name: /Proceed to Checkout/i });

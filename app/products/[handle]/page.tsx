@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getProduct } from '@/lib/shopify';
+import { getProduct, formatPrice } from '@/lib/shopify';
 import { ProductGallery } from '@/components/product/product-gallery';
 import { ProductActions } from '@/components/product/product-actions';
 import { UrgencyBadge } from '@/components/product/urgency-badge';
@@ -29,7 +29,9 @@ export default async function ProductPage({ params }: Props) {
 
   const images = product.images.edges.map((e) => e.node);
   const variants = product.variants.edges.map((e) => e.node);
-  const minInventory = Math.min(...variants.map((v) => v.quantityAvailable ?? 0));
+  const minInventory = variants.length > 0
+    ? Math.min(...variants.map((v) => v.quantityAvailable ?? 0))
+    : 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -61,19 +63,11 @@ export default async function ProductPage({ params }: Props) {
           {/* Price */}
           <div className="flex items-center gap-3 mb-4">
             <span className="text-brand-gold text-2xl font-bold">
-              {(() => {
-                const p = product.priceRange.minVariantPrice;
-                const num = parseFloat(p.amount);
-                return `₹${num.toLocaleString('en-IN')}`;
-              })()}
+              {formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode)}
             </span>
             {product.compareAtPriceRange?.minVariantPrice && (
               <span className="text-brand-text-muted text-lg line-through">
-                {(() => {
-                  const cp = product.compareAtPriceRange.minVariantPrice;
-                  const num = parseFloat(cp.amount);
-                  return `₹${num.toLocaleString('en-IN')}`;
-                })()}
+                {formatPrice(product.compareAtPriceRange.minVariantPrice.amount, product.compareAtPriceRange.minVariantPrice.currencyCode)}
               </span>
             )}
           </div>

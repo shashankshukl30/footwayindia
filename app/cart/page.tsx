@@ -96,7 +96,11 @@ export default function CartPage() {
                   </button>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => updateItem(line.id, Math.max(0, line.quantity - 1))}
+                      onClick={() =>
+                        line.quantity === 1
+                          ? removeItem(line.id)
+                          : updateItem(line.id, line.quantity - 1)
+                      }
                       disabled={isLoading}
                       aria-label="Decrease quantity"
                       className="w-7 h-7 border border-brand-border text-brand-text-secondary hover:border-brand-gold hover:text-brand-gold flex items-center justify-center transition-colors disabled:opacity-50"

@@ -1,31 +1,40 @@
 /* ─── Imports (must all precede any other rules) ───────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
 /* ─── Brand Token Theme (Tailwind v4 @theme) ──────────────── */
 @theme {
-  /* Colors */
-  --color-brand-bg:             #0A0A0A;
-  --color-brand-surface:        #1A1A1A;
-  --color-brand-elevated:       #242424;
-  --color-brand-border:         #2A2A2A;
-  --color-brand-gold:           #C9A84C;
-  --color-brand-gold-light:     #E8C96A;
-  --color-brand-gold-dark:      #A8873E;
-  --color-brand-text:           #FFFFFF;
-  --color-brand-text-secondary: #E5E5E5;
-  --color-brand-text-muted:     #9CA3AF;
-  --color-brand-error:          #EF4444;
+  /* Light theme colors */
+  --color-brand-bg:             #FAFAF8;
+  --color-brand-surface:        #F4F3F0;
+  --color-brand-elevated:       #ECEAE6;
+  --color-brand-border:         #E0DDD8;
+  --color-brand-gold:           #C8773A;
+  --color-brand-gold-light:     #D4855A;
+  --color-brand-gold-dark:      #A05E2A;
+  --color-brand-cream:          #F2EDE4;
+  --color-brand-text:           #0F0F0E;
+  --color-brand-text-secondary: #3D3C3A;
+  --color-brand-text-muted:     #5A5755;
+  --color-brand-error:          #E8191A;
   --color-brand-success:        #22C55E;
+  --color-brand-red:            #E8191A;
+
+  /* Dark footer tokens (footer stays dark) */
+  --color-footer-bg:            #0F0F0E;
+  --color-footer-surface:       #161616;
+  --color-footer-border:        #2A2A2A;
+  --color-footer-text:          #FFFFFF;
+  --color-footer-muted:         #6B7280;
 
   /* Fonts */
-  --font-sans:  'Inter', system-ui, sans-serif;
-  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans:    'Inter', system-ui, sans-serif;
+  --font-serif:   'Cormorant Garamond', Georgia, serif;
+  --font-display: 'Barlow Condensed', system-ui, sans-serif;
 
   /* Custom animations */
-  --animate-fade-in:    fadeIn 0.3s ease-out;
-  --animate-slide-in:   slideIn 0.3s ease-out;
-  --animate-pulse-gold: pulseGold 2s ease-in-out infinite;
+  --animate-fade-in:    fadeIn 0.5s ease-out;
+  --animate-slide-in:   slideIn 0.4s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 /* ─── Keyframes ────────────────────────────────────────────── */
@@ -39,9 +48,24 @@
   to   { transform: translateX(0); }
 }
 
-@keyframes pulseGold {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.4); }
-  50%       { box-shadow: 0 0 0 8px rgba(201, 168, 76, 0); }
+@keyframes clipReveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0% 0 0); }
+}
+
+@keyframes cursorScale {
+  from { transform: translate(-50%, -50%) scale(1); }
+  to   { transform: translate(-50%, -50%) scale(1.5); }
+}
+
+@keyframes kenBurns {
+  0%   { transform: scale(1)    translate(0,    0); }
+  100% { transform: scale(1.09) translate(-1%, -0.5%); }
+}
+
+@keyframes kenBurnsAlt {
+  0%   { transform: scale(1)    translate(0, 0); }
+  100% { transform: scale(1.09) translate(1%, -0.5%); }
 }
 
 /* ─── Base Styles ──────────────────────────────────────────── */
@@ -59,30 +83,54 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
 }
 
 /* ─── Custom Scrollbar ─────────────────────────────────────── */
-::-webkit-scrollbar       { width: 6px; }
-::-webkit-scrollbar-track { background: var(--color-brand-bg); }
-::-webkit-scrollbar-thumb { background: var(--color-brand-border); border-radius: 3px; }
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: var(--color-brand-surface); }
+::-webkit-scrollbar-thumb { background: var(--color-brand-border); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-brand-gold); }
 
 /* ─── Text selection ───────────────────────────────────────── */
 ::selection {
   background-color: var(--color-brand-gold);
-  color: var(--color-brand-bg);
+  color: #FFFFFF;
 }
 
 /* ─── Focus ring ───────────────────────────────────────────── */
 :focus-visible {
-  outline: 2px solid var(--color-brand-gold);
-  outline-offset: 2px;
+  outline: 1px solid var(--color-brand-gold);
+  outline-offset: 3px;
 }
 
-/* ─── Utility: line-clamp polyfill (for older browsers) ─────── */
+/* ─── Utility: line-clamp ───────────────────────────────────── */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* ─── Clip-path reveal utility ──────────────────────────────── */
+.clip-reveal {
+  animation: clipReveal 0.9s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+/* ─── Image crossfade hover ─────────────────────────────────── */
+.img-swap { position: relative; overflow: hidden; }
+.img-swap .img-secondary {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.img-swap:hover .img-secondary { opacity: 1; }
+
+/* ─── Premium divider line ──────────────────────────────────── */
+.divider-gold {
+  width: 32px;
+  height: 1px;
+  background: var(--color-brand-gold);
+  display: block;
 }

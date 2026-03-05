@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getCollection } from '@/lib/shopify';
 import { ProductCard } from '@/components/product/product-card';
@@ -21,39 +20,47 @@ export default async function CollectionPage({ params }: Props) {
   const { handle } = await params;
   const collection = await getCollection(handle);
 
-  if (!collection) notFound();
+  const products = collection?.products.edges.map((e) => e.node) ?? [];
 
-  const products = collection.products.edges.map((e) => e.node);
+  const title = collection?.title ?? handle.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const description = collection?.description;
 
   return (
     <>
       {/* Collection header */}
-      <div className="bg-brand-surface border-b border-brand-border py-12 px-4 text-center">
-        <p className="text-brand-gold text-xs font-semibold tracking-[0.3em] uppercase mb-2">
-          Collection
-        </p>
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-brand-text">
-          {collection.title}
+      <div className="border-b border-brand-border py-16 px-4 text-center">
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <span className="w-5 h-px bg-brand-gold" />
+          <p className="text-[10px] font-medium tracking-[0.4em] uppercase text-brand-gold">
+            Collection
+          </p>
+          <span className="w-5 h-px bg-brand-gold" />
+        </div>
+        <h1 className="font-display font-bold uppercase tracking-tight text-brand-text"
+            style={{ fontSize: 'clamp(32px, 5vw, 72px)' }}>
+          {title}
         </h1>
-        {collection.description && (
-          <p className="text-brand-text-muted text-sm mt-3 max-w-lg mx-auto">
-            {collection.description}
+        {description && (
+          <p className="text-brand-text-muted text-sm mt-3 max-w-lg mx-auto font-light">
+            {description}
           </p>
         )}
       </div>
 
       {/* Product grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {products.length === 0 ? (
-          <div className="text-center py-24">
-            <p className="text-brand-text-muted text-lg">No products in this collection yet.</p>
+          <div className="text-center py-32">
+            <p className="text-brand-text-muted text-[11px] tracking-[0.3em] uppercase">
+              Products coming soon
+            </p>
           </div>
         ) : (
           <>
-            <p className="text-brand-text-muted text-sm mb-8">
+            <p className="text-brand-text-muted text-[11px] tracking-[0.2em] uppercase mb-10">
               {products.length} product{products.length !== 1 ? 's' : ''}
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

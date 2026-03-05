@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Instagram, Facebook, Youtube, Twitter } from 'lucide-react';
+import Image from 'next/image';
+import { Instagram, Facebook, Youtube, Twitter, Heart } from 'lucide-react';
 
 const FOOTER_SECTIONS = [
   {
@@ -7,7 +8,7 @@ const FOOTER_SECTIONS = [
     links: [
       { href: '/collections/mens',   label: "Men's Footwear" },
       { href: '/collections/womens', label: "Women's Footwear" },
-      { href: '/collections/kids',   label: "Children's Footwear" },
+      { href: '/collections/kids',   label: "Kids' Footwear" },
       { href: '/search',             label: 'All Products' },
     ],
   },
@@ -17,11 +18,11 @@ const FOOTER_SECTIONS = [
       { href: '/pages/size-guide', label: 'Size Guide' },
       { href: '/pages/returns',    label: 'Returns & Exchanges' },
       { href: '/pages/contact',    label: 'Contact Us' },
-      { href: '/pages/about',      label: 'About Footway India' },
+      { href: '/pages/about',      label: 'About Us' },
     ],
   },
   {
-    title: 'Policies',
+    title: 'Legal',
     links: [
       { href: '/pages/privacy',  label: 'Privacy Policy' },
       { href: '/pages/terms',    label: 'Terms of Service' },
@@ -38,43 +39,41 @@ const SOCIAL_LINKS = [
   { href: '#', icon: Twitter,   label: 'Twitter/X' },
 ];
 
-const TRUST_BADGES = [
-  '🔒 100% Secure Payments',
-  '🚚 Free Shipping ₹999+',
-  '↩️ 30-Day Returns',
-  '⭐ 4.8/5 Rating',
-  '📞 24/7 Support',
-];
-
 export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-brand-surface border-t border-brand-border mt-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <footer className="bg-footer-bg mt-24">
 
-        {/* Top: Brand + Link columns */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
+      {/* Main footer content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
 
           {/* Brand column */}
-          <div className="col-span-2 md:col-span-1">
-            <p className="font-serif text-xl font-bold tracking-widest text-brand-text uppercase mb-4">
-              FOOTWAY INDIA
-            </p>
-            <p className="text-brand-text-muted text-sm leading-relaxed mb-6">
+          <div className="col-span-2">
+            <div className="mb-5">
+              <Image
+                src="/logo.png"
+                alt="Footway India"
+                width={120}
+                height={48}
+                className="h-10 w-auto object-contain"
+              />
+            </div>
+            <p className="text-footer-muted text-sm leading-relaxed mb-8 max-w-xs font-light">
               Premium footwear crafted for those who move with intention.
               Quality you can feel with every step.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-5">
               {SOCIAL_LINKS.map(({ href, icon: Icon, label }) => (
                 <a
                   key={label}
                   href={href}
                   aria-label={label}
                   rel="noopener noreferrer"
-                  className="text-brand-text-muted hover:text-brand-gold transition-colors duration-200"
+                  className="text-footer-muted hover:text-footer-text transition-colors duration-300"
                 >
-                  <Icon size={18} aria-hidden="true" />
+                  <Icon size={16} strokeWidth={1.5} aria-hidden="true" />
                 </a>
               ))}
             </div>
@@ -83,7 +82,7 @@ export function Footer() {
           {/* Link columns */}
           {FOOTER_SECTIONS.map((section) => (
             <div key={section.title}>
-              <h3 className="text-brand-text font-semibold text-sm uppercase tracking-wider mb-4">
+              <h3 className="text-footer-text text-[10px] font-semibold uppercase tracking-[0.25em] mb-5">
                 {section.title}
               </h3>
               <ul className="space-y-3" role="list">
@@ -91,7 +90,7 @@ export function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-brand-text-muted text-sm hover:text-brand-gold transition-colors duration-200"
+                      className="text-footer-muted text-sm font-light hover:text-footer-text transition-colors duration-300"
                     >
                       {link.label}
                     </Link>
@@ -101,31 +100,38 @@ export function Footer() {
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Trust badges */}
-        <div className="flex flex-wrap items-center justify-center gap-6 py-8 border-t border-b border-brand-border mb-8">
-          {TRUST_BADGES.map((badge) => (
-            <span key={badge} className="text-brand-text-muted text-xs sm:text-sm font-medium">
-              {badge}
-            </span>
-          ))}
-        </div>
-
-        {/* Bottom row */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-brand-text-muted text-xs">
-            © {year} Footway India. All rights reserved.
-          </p>
-          <div className="flex items-center gap-2">
-            <span className="text-brand-text-muted text-xs bg-brand-elevated px-2 py-1 rounded-sm">
-              UPI
-            </span>
-            <span className="text-brand-text-muted text-xs bg-brand-elevated px-2 py-1 rounded-sm">
-              Razorpay
-            </span>
-            <span className="text-brand-text-muted text-xs bg-brand-elevated px-2 py-1 rounded-sm">
-              EMI
-            </span>
+      {/* Bottom bar */}
+      <div className="border-t border-footer-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+            <p className="text-footer-muted text-[11px] tracking-[0.1em]">
+              © {year} Footway India. All rights reserved.
+            </p>
+            <span className="hidden sm:block text-footer-border">·</span>
+            <p className="flex items-center gap-1.5 text-footer-muted text-[11px] tracking-[0.1em]">
+              Made with <Heart size={10} className="text-brand-red fill-brand-red" aria-label="love" /> by{' '}
+              <a
+                href="https://www.digiocular.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-footer-muted hover:text-footer-text underline underline-offset-2 transition-colors duration-200"
+              >
+                Digiocular
+              </a>
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-footer-muted text-[10px] tracking-[0.15em] uppercase">Secure payments via</span>
+            {['UPI', 'Razorpay', 'EMI'].map((method) => (
+              <span
+                key={method}
+                className="text-footer-muted text-[10px] font-medium tracking-[0.1em] uppercase border border-footer-border px-2.5 py-1"
+              >
+                {method}
+              </span>
+            ))}
           </div>
         </div>
       </div>

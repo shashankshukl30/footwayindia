@@ -1,5 +1,10 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, ShoppingBag } from 'lucide-react';
+import Image from 'next/image';
+import { Search, ShoppingBag, Heart, Menu, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV_LINKS = [
   { href: '/collections/mens',   label: "Men's" },
@@ -9,59 +14,196 @@ const NAV_LINKS = [
 ];
 
 export function Navbar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
   return (
-    <header className="sticky top-0 z-50 bg-brand-bg/95 backdrop-blur-md border-b border-brand-border">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <>
+      <header
+        className={`sticky top-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? 'bg-white/98 backdrop-blur-xl border-b border-brand-border shadow-sm'
+            : 'bg-brand-bg/95 backdrop-blur-md border-b border-brand-border/60'
+        }`}
+      >
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14">
 
-          {/* Logo */}
-          <Link
-            href="/"
-            className="font-serif text-xl font-bold tracking-widest text-brand-text uppercase hover:text-brand-gold transition-colors duration-200"
-          >
-            FOOTWAY INDIA
-          </Link>
-
-          {/* Desktop Nav Links */}
-          <ul className="hidden md:flex items-center gap-8" role="list">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-sm font-medium text-brand-text-secondary hover:text-brand-gold transition-colors duration-200 tracking-wide uppercase"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          {/* Right Icons */}
-          <div className="flex items-center gap-3">
-            <Link
-              href="/search"
-              className="p-2 text-brand-text-secondary hover:text-brand-gold transition-colors duration-200"
-              aria-label="Search products"
-            >
-              <Search size={20} aria-hidden="true" />
-            </Link>
-
-            <Link
-              href="/cart"
-              className="relative p-2 text-brand-text-secondary hover:text-brand-gold transition-colors duration-200"
-              aria-label="Shopping cart"
-            >
-              <ShoppingBag size={20} aria-hidden="true" />
-              {/* Cart count badge — wired up in Phase 4 */}
-              <span
-                id="cart-count-badge"
-                className="absolute -top-1 -right-1 w-4 h-4 bg-brand-gold text-brand-bg text-[10px] font-bold rounded-full flex items-center justify-center hidden"
-                aria-live="polite"
+            {/* Logo */}
+            <Link href="/" className="flex items-center" onClick={() => setMobileOpen(false)}>
+              <Image
+                src="/logo.png"
+                alt="Footway India"
+                width={160}
+                height={64}
+                className="h-12 w-auto object-contain"
+                priority
               />
             </Link>
+
+            {/* Desktop Nav Links */}
+            <ul className="hidden md:flex items-center gap-10" role="list">
+              {NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="relative text-[11px] font-medium text-brand-text-muted hover:text-brand-text transition-colors duration-300 tracking-[0.15em] uppercase group"
+                  >
+                    {link.label}
+                    <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-brand-gold group-hover:w-full transition-all duration-300" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            {/* Right Icons */}
+            <div className="flex items-center gap-1">
+              <Link
+                href="/search"
+                className="p-2.5 text-brand-text-muted hover:text-brand-text transition-colors duration-300"
+                aria-label="Search products"
+              >
+                <Search size={18} aria-hidden="true" strokeWidth={1.5} />
+              </Link>
+
+              <Link
+                href="/wishlist"
+                className="p-2.5 text-brand-text-muted hover:text-brand-gold transition-colors duration-300"
+                aria-label="Wishlist"
+              >
+                <Heart size={18} aria-hidden="true" strokeWidth={1.5} />
+              </Link>
+
+              <Link
+                href="/cart"
+                className="relative p-2.5 text-brand-text-muted hover:text-brand-text transition-colors duration-300"
+                aria-label="Shopping cart"
+              >
+                <ShoppingBag size={18} aria-hidden="true" strokeWidth={1.5} />
+                <span
+                  id="cart-count-badge"
+                  className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-brand-gold text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden"
+                  aria-live="polite"
+                />
+              </Link>
+
+              {/* Mobile menu toggle */}
+              <button
+                onClick={() => setMobileOpen((v) => !v)}
+                className="md:hidden p-2.5 text-brand-text-muted hover:text-brand-text transition-colors duration-300"
+                aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={mobileOpen}
+              >
+                {mobileOpen ? <X size={18} strokeWidth={1.5} /> : <Menu size={18} strokeWidth={1.5} />}
+              </button>
+            </div>
           </div>
-        </div>
-      </nav>
-    </header>
+        </nav>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm md:hidden"
+              onClick={() => setMobileOpen(false)}
+            />
+
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ duration: 0.4, ease: [0.76, 0, 0.24, 1] }}
+              className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-white border-l border-brand-border flex flex-col md:hidden shadow-xl"
+            >
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between px-6 h-14 border-b border-brand-border">
+                <Image
+                  src="/logo.png"
+                  alt="Footway India"
+                  width={110}
+                  height={44}
+                  className="h-9 w-auto object-contain"
+                />
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="p-2 text-brand-text-muted hover:text-brand-text transition-colors"
+                  aria-label="Close menu"
+                >
+                  <X size={18} strokeWidth={1.5} />
+                </button>
+              </div>
+
+              {/* Links */}
+              <nav className="flex-1 px-6 py-8">
+                <ul className="space-y-1" role="list">
+                  {NAV_LINKS.map((link, i) => (
+                    <motion.li
+                      key={link.href}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.07 + 0.1, duration: 0.3 }}
+                    >
+                      <Link
+                        href={link.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="block py-3 font-display text-2xl font-bold tracking-wide text-brand-text hover:text-brand-gold transition-colors duration-200 uppercase border-b border-brand-border"
+                      >
+                        {link.label}
+                      </Link>
+                    </motion.li>
+                  ))}
+                </ul>
+
+                {/* Mobile bottom links */}
+                <div className="mt-8 space-y-3">
+                  <Link
+                    href="/search"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 text-brand-text-muted hover:text-brand-text transition-colors duration-200 text-sm tracking-wide"
+                  >
+                    <Search size={16} strokeWidth={1.5} />
+                    Search
+                  </Link>
+                  <Link
+                    href="/cart"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 text-brand-text-muted hover:text-brand-text transition-colors duration-200 text-sm tracking-wide"
+                  >
+                    <ShoppingBag size={16} strokeWidth={1.5} />
+                    Cart
+                  </Link>
+                </div>
+              </nav>
+
+              {/* Drawer Footer */}
+              <div className="px-6 py-6 border-t border-brand-border bg-brand-surface">
+                <p className="text-brand-text-muted text-xs tracking-[0.2em] uppercase">
+                  Free shipping ₹999+
+                </p>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

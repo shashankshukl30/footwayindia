@@ -1,119 +1,264 @@
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
-export function HeroSection() {
-  return (
-    <section className="relative w-full min-h-[90vh] flex items-center overflow-hidden bg-brand-bg">
+const CYCLING_WORDS = [
+  'BOLDLY',
+  'FREELY',
+  'FEARLESSLY',
+  'FIERCELY',
+  'DIFFERENTLY',
+];
 
-      {/* Background image + overlay */}
+// Alternating Ken Burns direction per image for variety
+const HERO_IMAGES = [
+  {
+    src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1920&q=85',
+    kb: 'kenBurns',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=1920&q=85',
+    kb: 'kenBurnsAlt',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=1920&q=85',
+    kb: 'kenBurns',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=1920&q=85',
+    kb: 'kenBurnsAlt',
+  },
+];
+
+const SLIDE_DURATION = 2800;   // ms each image shows
+const FADE_DURATION  = 0.9;    // seconds crossfade
+
+export function HeroSection() {
+  const [wordIndex,  setWordIndex]  = useState(0);
+  const [imageIndex, setImageIndex] = useState(0);
+  const [mounted,    setMounted]    = useState(false);
+  const [paused,     setPaused]     = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 100);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Word cycling
+  useEffect(() => {
+    const t = setInterval(() => setWordIndex((i) => (i + 1) % CYCLING_WORDS.length), 2400);
+    return () => clearInterval(t);
+  }, []);
+
+  // Image slideshow — pause on hover
+  useEffect(() => {
+    if (paused) return;
+    const t = setInterval(() => setImageIndex((i) => (i + 1) % HERO_IMAGES.length), SLIDE_DURATION);
+    return () => clearInterval(t);
+  }, [paused]);
+
+  const goTo = useCallback((i: number) => setImageIndex(i), []);
+
+  return (
+    <section
+      className="relative w-full min-h-[95vh] flex items-end overflow-hidden bg-brand-bg pb-16 md:pb-20"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+
+      {/* ── Slideshow images with crossfade + Ken Burns ── */}
       <div className="absolute inset-0">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1920&q=80"
-          alt=""
-          role="presentation"
-          className="w-full h-full object-cover object-center opacity-40"
-          loading="eager"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-bg via-brand-bg/80 to-transparent" />
+        <AnimatePresence mode="sync" initial={false}>
+          <motion.div
+            key={imageIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: FADE_DURATION, ease: 'easeInOut' }}
+            className="absolute inset-0 will-change-transform"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={HERO_IMAGES[imageIndex]!.src}
+              alt=""
+              role="presentation"
+              className="w-full h-full object-cover object-center opacity-50"
+              style={{ animation: `${HERO_IMAGES[imageIndex]!.kb} 7s ease-out forwards` }}
+              loading={imageIndex === 0 ? 'eager' : 'lazy'}
+            />
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Gradient overlays — always above images */}
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-bg/90 via-brand-bg/50 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-bg/70 via-transparent to-transparent pointer-events-none" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl">
+      {/* ── Decorative background text ── */}
+      <div
+        className="absolute bottom-0 right-0 font-display font-extrabold uppercase leading-none select-none pointer-events-none text-[20vw] text-brand-text/[0.03] tracking-tighter"
+        aria-hidden="true"
+      >
+        FOOTWAY
+      </div>
+
+      {/* ── Main content ── */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl">
 
           {/* Eyebrow */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            className="text-brand-gold text-xs sm:text-sm font-semibold tracking-[0.3em] uppercase mb-4"
-          >
-            New Season 2026
-          </motion.p>
-
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold text-brand-text leading-tight mb-6"
-          >
-            Step Into
-            <span className="block text-brand-gold italic">Excellence</span>
-          </motion.h1>
-
-          {/* Sub */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="text-brand-text-secondary text-base sm:text-lg leading-relaxed mb-10 max-w-lg"
-          >
-            Premium footwear for those who refuse to settle. Crafted for comfort,
-            designed for impact. Free shipping on orders above ₹999.
-          </motion.p>
-
-          {/* CTAs */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.6 }}
-            className="flex flex-wrap gap-4"
+            transition={{ delay: 0.1, duration: 0.6, ease: 'easeOut' }}
+            className="flex items-center gap-4 mb-8"
           >
-            <Link
-              href="/collections/mens"
-              className="group inline-flex items-center gap-2 bg-brand-gold text-brand-bg px-7 py-3.5 text-sm font-semibold tracking-wide uppercase hover:bg-brand-gold-light transition-all duration-200 animate-pulse-gold"
-            >
-              Shop Men&apos;s
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-200" aria-hidden="true" />
-            </Link>
-            <Link
-              href="/collections/womens"
-              className="inline-flex items-center gap-2 border border-brand-border text-brand-text px-7 py-3.5 text-sm font-semibold tracking-wide uppercase hover:border-brand-gold hover:text-brand-gold transition-all duration-200"
-            >
-              Shop Women&apos;s
-            </Link>
+            <span className="divider-gold" />
+            <p className="text-[10px] font-medium tracking-[0.4em] uppercase text-brand-gold">
+              New Season 2026
+            </p>
           </motion.div>
 
-          {/* Social proof micro-strip */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.9, duration: 0.6 }}
-            className="flex items-center gap-3 mt-10"
+          {/* MOVE — static */}
+          <div className="overflow-hidden mb-1">
+            <motion.h1
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              transition={{ delay: 0.2, duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+              className="font-display font-extrabold uppercase leading-[0.88] tracking-[-0.02em] text-brand-text"
+              style={{ fontSize: 'clamp(52px, 9vw, 140px)' }}
+            >
+              MOVE
+            </motion.h1>
+          </div>
+
+          {/* Cycling word */}
+          <div
+            className="overflow-hidden mb-8"
+            style={{ height: 'clamp(46px, 7.92vw, 124px)' }}
+            aria-live="polite"
+            aria-atomic="true"
           >
-            <div className="flex -space-x-2" aria-hidden="true">
-              {['😊', '😍', '🔥', '⭐'].map((emoji, i) => (
-                <div
-                  key={i}
-                  className="w-8 h-8 rounded-full bg-brand-elevated border-2 border-brand-bg flex items-center justify-center text-xs"
+            <AnimatePresence mode="wait">
+              <motion.h1
+                key={wordIndex}
+                initial={{ y: '105%', opacity: 0 }}
+                animate={{ y: '0%', opacity: 1 }}
+                exit={{ y: '-105%', opacity: 0 }}
+                transition={{
+                  duration: 0.55,
+                  ease: [0.76, 0, 0.24, 1],
+                  delay: mounted ? 0 : 0.75,
+                }}
+                className="font-display font-extrabold uppercase leading-[0.88] tracking-[-0.02em] text-brand-gold"
+                style={{ fontSize: 'clamp(52px, 9vw, 140px)' }}
+              >
+                {CYCLING_WORDS[wordIndex]}
+              </motion.h1>
+            </AnimatePresence>
+          </div>
+
+          {/* Bottom row */}
+          <div className="flex flex-col md:flex-row md:items-end gap-8 md:gap-16">
+
+            <div className="flex-1">
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.7 }}
+                className="text-brand-text-secondary text-sm leading-relaxed mb-8 max-w-sm font-light"
+                style={{ letterSpacing: '0.01em' }}
+              >
+                Premium footwear for those who refuse to settle.
+                Free shipping on orders above ₹999.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.75, duration: 0.5 }}
+                className="flex flex-wrap gap-3"
+              >
+                <Link
+                  href="/collections/mens"
+                  className="group inline-flex items-center gap-3 bg-brand-text text-white px-7 py-3.5 text-[11px] font-semibold tracking-[0.2em] uppercase hover:bg-brand-gold transition-colors duration-300"
                 >
-                  {emoji}
-                </div>
-              ))}
+                  Shop Men&apos;s
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-300" aria-hidden="true" />
+                </Link>
+                <Link
+                  href="/collections/womens"
+                  className="inline-flex items-center gap-3 border border-brand-border text-brand-text px-7 py-3.5 text-[11px] font-medium tracking-[0.2em] uppercase hover:border-brand-text hover:bg-brand-text hover:text-white transition-all duration-300"
+                >
+                  Shop Women&apos;s
+                </Link>
+              </motion.div>
             </div>
-            <div>
-              <p className="text-brand-text text-sm font-semibold">★★★★★ 4.8/5</p>
-              <p className="text-brand-text-muted text-xs">Trusted by 2,000+ customers</p>
-            </div>
-          </motion.div>
+
+            {/* Stats */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.9, duration: 0.6 }}
+              className="flex items-center gap-8 md:gap-10"
+            >
+              <div>
+                <p className="font-display font-bold text-3xl text-brand-text tracking-tight leading-none mb-1">4.8</p>
+                <p className="text-brand-text-muted text-[10px] tracking-[0.2em] uppercase">Rating</p>
+              </div>
+              <div className="w-px h-10 bg-brand-border" />
+              <div>
+                <p className="font-display font-bold text-3xl text-brand-text tracking-tight leading-none mb-1">2K+</p>
+                <p className="text-brand-text-muted text-[10px] tracking-[0.2em] uppercase">Customers</p>
+              </div>
+              <div className="w-px h-10 bg-brand-border" />
+              <div>
+                <p className="font-display font-bold text-3xl text-brand-text tracking-tight leading-none mb-1">30</p>
+                <p className="text-brand-text-muted text-[10px] tracking-[0.2em] uppercase">Day Returns</p>
+              </div>
+            </motion.div>
+
+          </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* ── Slide progress indicators (bottom centre) ── */}
       <motion.div
-        animate={{ y: [0, 8, 0] }}
-        transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.6 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2"
         aria-hidden="true"
       >
-        <span className="text-brand-text-muted text-xs tracking-widest uppercase">Scroll</span>
-        <div className="w-px h-8 bg-gradient-to-b from-brand-text-muted to-transparent" />
+        {HERO_IMAGES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            className={`h-[2px] rounded-full transition-all duration-500 ease-out ${
+              i === imageIndex
+                ? 'w-8 bg-brand-gold'
+                : 'w-2 bg-brand-border hover:bg-brand-text-muted'
+            }`}
+          />
+        ))}
       </motion.div>
+
+      {/* ── Scroll indicator ── */}
+      <motion.div
+        animate={{ y: [0, 6, 0] }}
+        transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+        className="absolute bottom-8 right-8 flex-col items-center gap-2 hidden md:flex"
+        aria-hidden="true"
+      >
+        <div className="w-px h-12 bg-gradient-to-b from-transparent via-brand-border to-brand-gold" />
+        <span className="text-brand-text-muted text-[9px] tracking-[0.3em] uppercase rotate-90 origin-center mt-2">
+          Scroll
+        </span>
+      </motion.div>
+
     </section>
   );
 }

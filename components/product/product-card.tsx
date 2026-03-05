@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Star } from 'lucide-react';
 import { formatPrice } from '@/lib/shopify';
 import type { Product } from '@/lib/shopify/types';
 
@@ -25,71 +24,68 @@ export function ProductCard({ product, inventoryCount }: ProductCardProps) {
 
   return (
     <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-20px' }}
+      transition={{ duration: 0.5 }}
       className="group"
     >
       <Link href={`/products/${product.handle}`} className="block">
 
-        {/* Image container */}
-        <div className="relative aspect-square overflow-hidden bg-brand-surface border border-brand-border group-hover:border-brand-gold transition-colors duration-300">
+        {/* Image container — portrait 4:5 ratio, light surface bg */}
+        <div className="relative aspect-[4/5] overflow-hidden bg-brand-surface">
           {product.featuredImage ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={product.featuredImage.url}
               alt={product.featuredImage.altText ?? product.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-brand-text-muted text-sm">
-              No image
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-brand-text-muted text-xs tracking-[0.2em] uppercase">No image</span>
             </div>
           )}
 
           {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-2">
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             {isOnSale && (
-              <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 uppercase">
+              <span className="bg-brand-red text-white text-[9px] font-semibold px-2.5 py-1 tracking-[0.15em] uppercase">
                 -{discount}%
               </span>
             )}
             {isLowStock && (
-              <span className="bg-brand-gold text-brand-bg text-xs font-bold px-2 py-0.5 uppercase">
-                Only {inventoryCount} left
+              <span className="bg-white text-brand-text-muted text-[9px] font-medium px-2.5 py-1 tracking-[0.15em] uppercase border border-brand-border">
+                {inventoryCount} left
               </span>
             )}
           </div>
 
-          {/* Quick-add overlay (slides up on hover) */}
-          <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-            <div className="w-full bg-brand-gold text-brand-bg py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-brand-gold-light transition-colors">
-              <ShoppingBag size={14} aria-hidden="true" />
-              Quick View
+          {/* Quick view — slim bottom bar */}
+          <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
+            <div className="w-full bg-[#0F0F0E] text-white py-3 text-[10px] font-medium uppercase tracking-[0.25em] flex items-center justify-center">
+              View Product
             </div>
           </div>
         </div>
 
         {/* Info */}
         <div className="pt-4 pb-2">
-          {/* Placeholder rating */}
-          <div className="flex items-center gap-1 mb-2" aria-label="4.8 out of 5 stars">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} size={11} className="fill-brand-gold text-brand-gold" aria-hidden="true" />
-            ))}
-            <span className="text-brand-text-muted text-xs ml-1">(4.8)</span>
-          </div>
-
-          <h3 className="text-brand-text text-sm font-medium group-hover:text-brand-gold transition-colors duration-200 mb-1 line-clamp-2">
+          <p className="text-brand-text-muted text-[9px] font-medium tracking-[0.2em] uppercase mb-1">
+            {product.vendor ?? 'Footway India'}
+          </p>
+          <h3 className="text-brand-text-secondary text-sm font-light leading-snug mb-3 group-hover:text-brand-text transition-colors duration-300"
+              style={{ letterSpacing: '0.01em' }}>
             {product.title}
           </h3>
 
-          <div className="flex items-center gap-2">
-            <span className="text-brand-gold font-semibold text-sm">
+          <div className="flex items-center gap-3">
+            <span className="text-brand-text font-medium text-sm">
               {formatPrice(minPrice.amount, minPrice.currencyCode)}
             </span>
             {isOnSale && compareMin && (
-              <span className="text-brand-text-muted text-xs line-through">
+              <span className="text-brand-text-muted text-xs line-through font-light">
                 {formatPrice(compareMin.amount, compareMin.currencyCode)}
               </span>
             )}

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Tag } from 'lucide-react';
 
 const CYCLING_WORDS = [
   'BOLDLY',
@@ -13,7 +13,6 @@ const CYCLING_WORDS = [
   'DIFFERENTLY',
 ];
 
-// Alternating Ken Burns direction per image for variety
 const HERO_IMAGES = [
   {
     src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1920&q=85',
@@ -33,8 +32,8 @@ const HERO_IMAGES = [
   },
 ];
 
-const SLIDE_DURATION = 2800;   // ms each image shows
-const FADE_DURATION  = 0.9;    // seconds crossfade
+const SLIDE_DURATION = 2800;
+const FADE_DURATION  = 0.9;
 
 export function HeroSection() {
   const [wordIndex,  setWordIndex]  = useState(0);
@@ -47,13 +46,11 @@ export function HeroSection() {
     return () => clearTimeout(t);
   }, []);
 
-  // Word cycling
   useEffect(() => {
     const t = setInterval(() => setWordIndex((i) => (i + 1) % CYCLING_WORDS.length), 2400);
     return () => clearInterval(t);
   }, []);
 
-  // Image slideshow — pause on hover
   useEffect(() => {
     if (paused) return;
     const t = setInterval(() => setImageIndex((i) => (i + 1) % HERO_IMAGES.length), SLIDE_DURATION);
@@ -69,7 +66,7 @@ export function HeroSection() {
       onMouseLeave={() => setPaused(false)}
     >
 
-      {/* ── Slideshow images with crossfade + Ken Burns ── */}
+      {/* ── Slideshow images ── */}
       <div className="absolute inset-0">
         <AnimatePresence mode="sync" initial={false}>
           <motion.div
@@ -85,21 +82,21 @@ export function HeroSection() {
               src={HERO_IMAGES[imageIndex]!.src}
               alt=""
               role="presentation"
-              className="w-full h-full object-cover object-center opacity-50"
+              className="w-full h-full object-cover object-center opacity-70"
               style={{ animation: `${HERO_IMAGES[imageIndex]!.kb} 7s ease-out forwards` }}
               loading={imageIndex === 0 ? 'eager' : 'lazy'}
             />
           </motion.div>
         </AnimatePresence>
 
-        {/* Gradient overlays — always above images */}
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-bg/90 via-brand-bg/50 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-bg/70 via-transparent to-transparent pointer-events-none" />
+        {/* Lighter gradient so the image breathes on all screen sizes */}
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-bg/85 via-brand-bg/40 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-bg/60 via-transparent to-transparent pointer-events-none" />
       </div>
 
       {/* ── Decorative background text ── */}
       <div
-        className="absolute bottom-0 right-0 font-display font-extrabold uppercase leading-none select-none pointer-events-none text-[20vw] text-brand-text/[0.03] tracking-tighter"
+        className="absolute bottom-0 right-0 font-display font-extrabold uppercase leading-none select-none pointer-events-none text-[20vw] text-brand-text/[0.04] tracking-tighter"
         aria-hidden="true"
       >
         FOOTWAY
@@ -108,6 +105,22 @@ export function HeroSection() {
       {/* ── Main content ── */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl">
+
+          {/* ── Promo badge — above eyebrow ── */}
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05, duration: 0.5, ease: 'easeOut' }}
+            className="inline-flex items-center gap-2 mb-5"
+          >
+            <span className="inline-flex items-center gap-2 bg-brand-gold/15 border border-brand-gold/40 px-3 py-1.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-pulse flex-shrink-0" aria-hidden="true" />
+              <Tag size={10} className="text-brand-gold flex-shrink-0" aria-hidden="true" />
+              <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-brand-gold whitespace-nowrap">
+                New Arrivals — Free Shipping ₹999+
+              </span>
+            </span>
+          </motion.div>
 
           {/* Eyebrow */}
           <motion.div
@@ -225,7 +238,7 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* ── Slide progress indicators (bottom centre) ── */}
+      {/* ── Slide progress indicators ── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

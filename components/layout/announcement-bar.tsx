@@ -11,6 +11,7 @@ const ANNOUNCEMENTS = [
 export function AnnouncementBar() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fading, setFading] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -23,12 +24,23 @@ export function AnnouncementBar() {
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <div className="bg-[#0F0F0E] px-4">
-      <div className="max-w-7xl mx-auto relative flex items-center justify-end h-9">
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-        {/* Rotating announcement — absolutely centred across the full bar */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+  return (
+    <div
+      className={`bg-[#0F0F0E] overflow-hidden transition-all duration-300 ease-in-out ${
+        scrolled ? 'max-h-0' : 'max-h-12'
+      }`}
+    >
+      {/* Same padding as navbar: px-4 sm:px-6 lg:px-8 so text aligns */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative flex items-center justify-end h-9">
+
+        {/* Rotating announcement — centred within the same max-w container */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-4 sm:px-6 lg:px-8">
           <p
             className="text-[10px] font-medium tracking-[0.25em] uppercase text-white/70 transition-opacity duration-300"
             style={{ opacity: fading ? 0 : 1 }}
@@ -37,26 +49,17 @@ export function AnnouncementBar() {
           </p>
         </div>
 
-        {/* Utility links — right side */}
-        <div className="relative flex items-center gap-1 flex-shrink-0">
-          <Link
-            href="/pages/contact"
-            className="text-[10px] text-white/50 hover:text-white/90 transition-colors duration-200 tracking-[0.1em] px-2"
-          >
+        {/* Utility links — desktop only */}
+        <div className="relative hidden sm:flex items-center gap-1 flex-shrink-0">
+          <Link href="/pages/contact" className="text-[10px] text-white/50 hover:text-white/90 transition-colors duration-200 tracking-[0.1em] px-2">
             Help
           </Link>
           <span className="text-white/20 text-[10px]">|</span>
-          <Link
-            href="/account/register"
-            className="text-[10px] text-white/50 hover:text-white/90 transition-colors duration-200 tracking-[0.1em] px-2"
-          >
+          <Link href="/account/register" className="text-[10px] text-white/50 hover:text-white/90 transition-colors duration-200 tracking-[0.1em] px-2">
             Sign Up
           </Link>
           <span className="text-white/20 text-[10px]">|</span>
-          <Link
-            href="/account/login"
-            className="text-[10px] text-white/50 hover:text-white/90 transition-colors duration-200 tracking-[0.1em] px-2"
-          >
+          <Link href="/account/login" className="text-[10px] text-white/50 hover:text-white/90 transition-colors duration-200 tracking-[0.1em] px-2">
             Log In
           </Link>
         </div>

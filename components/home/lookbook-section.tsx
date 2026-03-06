@@ -12,7 +12,7 @@ export function LookbookSection() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section className="w-full grid md:grid-cols-2 min-h-[70vh] overflow-hidden">
+    <section className="max-w-7xl mx-auto grid md:grid-cols-2 min-h-[70vh] overflow-hidden">
       {/* Left — full-bleed image */}
       <div className="relative min-h-[50vw] md:min-h-0 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}

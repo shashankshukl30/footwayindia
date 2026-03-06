@@ -1,7 +1,14 @@
 import { shopifyClient } from './client';
 import { GET_PRODUCT_BY_HANDLE, GET_PRODUCTS, GET_COLLECTION_WITH_PRODUCTS } from './queries/product';
 import { CREATE_CART, GET_CART, ADD_TO_CART, UPDATE_CART_LINE, REMOVE_CART_LINE } from './queries/cart';
-import type { Product, Collection, Cart } from './types';
+import {
+  CUSTOMER_CREATE,
+  CUSTOMER_ACCESS_TOKEN_CREATE,
+  CUSTOMER_ACCESS_TOKEN_DELETE,
+  GET_CUSTOMER,
+  CUSTOMER_RECOVER,
+} from './queries/customer';
+import type { Product, Collection, Cart, Customer } from './types';
 
 // ─── Products ────────────────────────────────────────────────
 
@@ -85,6 +92,62 @@ export async function removeFromCart(cartId: string, lineIds: string[]): Promise
   const cart = data?.cartLinesRemove?.cart;
   if (!cart) throw new Error('removeFromCart returned null cart');
   return cart;
+}
+
+// ─── Customer ─────────────────────────────────────────────────
+
+export async function createCustomer(input: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}): Promise<{ customer: Customer | null; errors: string[] }> {
+  const { data, errors } = await shopifyClient.request(CUSTOMER_CREATE, { variables: { input } });
+  if (errors) return { customer: null, errors: [JSON.stringify(errors)] };
+  const customerUserErrors = data?.customerCreate?.customerUserErrors ?? [];
+  if (customerUserErrors.length) {
+    return { customer: null, errors: customerUserErrors.map((e: { message: string }) => e.message) };
+  }
+  return { customer: data?.customerCreate?.customer ?? null, errors: [] };
+}
+
+export async function loginCustomer(
+  email: string,
+  password: string
+): Promise<{ accessToken: string | null; expiresAt: string | null; errors: string[] }> {
+  const { data, errors } = await shopifyClient.request(CUSTOMER_ACCESS_TOKEN_CREATE, {
+    variables: { input: { email, password } },
+  });
+  if (errors) return { accessToken: null, expiresAt: null, errors: [JSON.stringify(errors)] };
+  const customerUserErrors = data?.customerAccessTokenCreate?.customerUserErrors ?? [];
+  if (customerUserErrors.length) {
+    return { accessToken: null, expiresAt: null, errors: customerUserErrors.map((e: { message: string }) => e.message) };
+  }
+  const token = data?.customerAccessTokenCreate?.customerAccessToken;
+  return { accessToken: token?.accessToken ?? null, expiresAt: token?.expiresAt ?? null, errors: [] };
+}
+
+export async function logoutCustomer(accessToken: string): Promise<void> {
+  await shopifyClient.request(CUSTOMER_ACCESS_TOKEN_DELETE, {
+    variables: { customerAccessToken: accessToken },
+  });
+}
+
+export async function getCustomer(accessToken: string): Promise<Customer | null> {
+  const { data, errors } = await shopifyClient.request(GET_CUSTOMER, {
+    variables: { customerAccessToken: accessToken },
+  });
+  if (errors) console.error('getCustomer errors:', errors);
+  return data?.customer ?? null;
+}
+
+export async function recoverCustomer(email: string): Promise<{ errors: string[] }> {
+  const { data, errors } = await shopifyClient.request(CUSTOMER_RECOVER, {
+    variables: { email },
+  });
+  if (errors) return { errors: [JSON.stringify(errors)] };
+  const customerUserErrors = data?.customerRecover?.customerUserErrors ?? [];
+  return { errors: customerUserErrors.map((e: { message: string }) => e.message) };
 }
 
 // ─── Utilities ────────────────────────────────────────────────

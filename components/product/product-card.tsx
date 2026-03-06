@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { formatPrice } from '@/lib/shopify';
 import type { Product } from '@/lib/shopify/types';
+import { WishlistButton } from './wishlist-button';
 
 interface ProductCardProps {
   product: Product;
@@ -47,6 +48,11 @@ export function ProductCard({ product, inventoryCount }: ProductCardProps) {
               <span className="text-brand-text-muted text-xs tracking-[0.2em] uppercase">No image</span>
             </div>
           )}
+
+          {/* Wishlist */}
+          <div className="absolute top-2 right-2 z-10">
+            <WishlistButton handle={product.handle} size="sm" />
+          </div>
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">

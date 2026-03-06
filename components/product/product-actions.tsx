@@ -34,12 +34,10 @@ export function ProductActions({ product }: ProductActionsProps) {
       {sizeOption && (
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-brand-text text-sm font-semibold uppercase tracking-wide">
-              Size
-            </h3>
+            <h3 className="text-brand-text text-[11px] font-semibold uppercase tracking-[0.2em]">Select Size</h3>
             {selectedVariant && (
               <span className="text-brand-text-muted text-xs">
-                Selected: {selectedVariant.selectedOptions.find(o => o.name.toLowerCase() === 'size')?.value}
+                {selectedVariant.selectedOptions.find(o => o.name.toLowerCase() === 'size')?.value}
               </span>
             )}
           </div>
@@ -48,7 +46,7 @@ export function ProductActions({ product }: ProductActionsProps) {
               const sizeValue = variant.selectedOptions.find(
                 (o) => o.name.toLowerCase() === 'size'
               )?.value ?? variant.title;
-              const isSelected = selectedVariantId === variant.id;
+              const isSelected  = selectedVariantId === variant.id;
               const isAvailable = variant.availableForSale;
 
               return (
@@ -59,11 +57,11 @@ export function ProductActions({ product }: ProductActionsProps) {
                   aria-pressed={isSelected}
                   aria-label={`Size ${sizeValue}${!isAvailable ? ' — out of stock' : ''}`}
                   className={`
-                    min-w-[3rem] px-3 py-2 text-sm font-medium border transition-all duration-200
+                    min-w-[3rem] px-3 py-2.5 text-sm font-medium border transition-all duration-200
                     ${isSelected
-                      ? 'border-brand-gold bg-brand-gold text-brand-bg'
+                      ? 'border-brand-text bg-brand-text text-white'
                       : isAvailable
-                        ? 'border-brand-border text-brand-text-secondary hover:border-brand-gold hover:text-brand-gold'
+                        ? 'border-brand-border text-brand-text-secondary hover:border-brand-text hover:text-brand-text'
                         : 'border-brand-border text-brand-text-muted opacity-40 cursor-not-allowed line-through'
                     }
                   `}
@@ -76,28 +74,28 @@ export function ProductActions({ product }: ProductActionsProps) {
         </div>
       )}
 
-      {/* Add to Cart button */}
+      {/* Add to Cart */}
       <button
         onClick={handleAddToCart}
         disabled={!selectedVariant || isLoading || !selectedVariant?.availableForSale}
         aria-label="Add to cart"
         className={`
-          w-full py-4 text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-3
-          transition-all duration-200
+          w-full py-4 text-[11px] font-semibold uppercase tracking-[0.2em] flex items-center justify-center gap-3
+          transition-all duration-300
           ${selectedVariant && selectedVariant.availableForSale && !isLoading
-            ? 'bg-brand-gold text-brand-bg hover:bg-brand-gold-light cursor-pointer'
-            : 'bg-brand-border text-brand-text-muted cursor-not-allowed'
+            ? 'bg-brand-text text-white hover:bg-brand-gold cursor-pointer'
+            : 'bg-brand-surface text-brand-text-muted border border-brand-border cursor-not-allowed'
           }
         `}
       >
         {isLoading ? (
-          <><Loader2 size={18} className="animate-spin" aria-hidden="true" /> Adding...</>
+          <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Adding...</>
         ) : !selectedVariant ? (
           'Select a Size'
         ) : !selectedVariant.availableForSale ? (
           'Out of Stock'
         ) : (
-          <><ShoppingBag size={18} aria-hidden="true" /> Add to Cart</>
+          <><ShoppingBag size={16} aria-hidden="true" /> Add to Cart</>
         )}
       </button>
     </div>

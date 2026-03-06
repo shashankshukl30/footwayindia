@@ -30,6 +30,7 @@ export interface Product {
   id: string;
   handle: string;
   title: string;
+  vendor: string | null;
   description: string;
   descriptionHtml: string;
   tags: string[];
@@ -80,4 +81,32 @@ export interface Cart {
     totalTaxAmount: Money | null;
   };
   lines: { edges: { node: CartLine }[] };
+}
+
+export interface CustomerOrderLineItem {
+  title: string;
+  quantity: number;
+  variant: {
+    image: Image | null;
+    price: Money;
+  } | null;
+}
+
+export interface CustomerOrder {
+  id: string;
+  orderNumber: number;
+  processedAt: string;
+  financialStatus: string;
+  fulfillmentStatus: string;
+  currentTotalPrice: Money;
+  lineItems: { edges: { node: CustomerOrderLineItem }[] };
+}
+
+export interface Customer {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  email: string;
+  phone: string | null;
+  orders: { edges: { node: CustomerOrder }[] };
 }

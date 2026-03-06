@@ -3,6 +3,7 @@ import { Navbar } from './navbar';
 import { Footer } from './footer';
 import { CustomCursor } from './custom-cursor';
 import { ScrollToTop } from './scroll-to-top';
+import { CartDrawer } from '@/components/cart/cart-drawer';
 import type { ReactNode } from 'react';
 
 export function SiteLayout({ children }: { children: ReactNode }) {
@@ -12,6 +13,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <CustomCursor />
       <AnnouncementBar />
       <Navbar />
+      <CartDrawer />
       <main>{children}</main>
       <Footer />
     </>

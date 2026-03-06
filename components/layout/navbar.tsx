@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Search, ShoppingBag, Heart, User, Menu, X } from 'lucide-react';
+import { Search, ShoppingBag, Heart, User, Menu, X, HelpCircle, LogIn, UserPlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '@/lib/cart-store';
 import { useCustomerStore } from '@/lib/customer-store';
@@ -36,8 +36,9 @@ export function Navbar() {
 
   return (
     <>
+      {/* Navbar — no sticky here, parent wrapper in layout handles it */}
       <header
-        className={`sticky top-0 z-40 transition-all duration-500 ${
+        className={`transition-all duration-500 ${
           scrolled
             ? 'bg-white/98 backdrop-blur-xl border-b border-brand-border shadow-sm'
             : 'bg-brand-bg/95 backdrop-blur-md border-b border-brand-border/60'
@@ -163,7 +164,7 @@ export function Navbar() {
                 </button>
               </div>
 
-              <nav className="flex-1 px-6 py-8">
+              <nav className="flex-1 overflow-y-auto px-6 py-8">
                 <ul className="space-y-1" role="list">
                   {NAV_LINKS.map((link, i) => (
                     <motion.li key={link.href} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.07 + 0.1, duration: 0.3 }}>
@@ -174,6 +175,7 @@ export function Navbar() {
                   ))}
                 </ul>
 
+                {/* Quick links */}
                 <div className="mt-8 space-y-3">
                   {[
                     { href: '/search',   icon: Search,      label: 'Search' },
@@ -188,6 +190,19 @@ export function Navbar() {
                     <ShoppingBag size={16} strokeWidth={1.5} />
                     Cart {totalQuantity > 0 && `(${totalQuantity})`}
                   </button>
+                </div>
+
+                {/* Help / Auth links — mobile only (replaces announcement bar utility links) */}
+                <div className="mt-8 pt-6 border-t border-brand-border space-y-3">
+                  <Link href="/pages/contact" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-brand-text-muted hover:text-brand-text transition-colors duration-200 text-sm tracking-wide">
+                    <HelpCircle size={16} strokeWidth={1.5} /> Help
+                  </Link>
+                  <Link href="/account/register" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-brand-text-muted hover:text-brand-text transition-colors duration-200 text-sm tracking-wide">
+                    <UserPlus size={16} strokeWidth={1.5} /> Sign Up
+                  </Link>
+                  <Link href="/account/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 text-brand-text-muted hover:text-brand-text transition-colors duration-200 text-sm tracking-wide">
+                    <LogIn size={16} strokeWidth={1.5} /> Log In
+                  </Link>
                 </div>
               </nav>
 

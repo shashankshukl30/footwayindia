@@ -11,8 +11,10 @@ export function SiteLayout({ children }: { children: ReactNode }) {
     <>
       <ScrollToTop />
       <CustomCursor />
-      <AnnouncementBar />
-      <Navbar />
+      <div className="sticky top-0 z-40">
+        <AnnouncementBar />
+        <Navbar />
+      </div>
       <CartDrawer />
       <main>{children}</main>
       <Footer />

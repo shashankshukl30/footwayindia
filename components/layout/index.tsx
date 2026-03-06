@@ -4,6 +4,8 @@ import { Footer } from './footer';
 import { CustomCursor } from './custom-cursor';
 import { ScrollToTop } from './scroll-to-top';
 import { CartDrawer } from '@/components/cart/cart-drawer';
+import { NewsletterPopup } from './newsletter-popup';
+import { CookieConsent } from './cookie-consent';
 import type { ReactNode } from 'react';
 
 export function SiteLayout({ children }: { children: ReactNode }) {
@@ -18,6 +20,8 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <CartDrawer />
       <main>{children}</main>
       <Footer />
+      <NewsletterPopup />
+      <CookieConsent />
     </>
   );
 }

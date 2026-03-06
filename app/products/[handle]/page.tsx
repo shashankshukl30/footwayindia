@@ -6,6 +6,9 @@ import { ProductActions } from '@/components/product/product-actions';
 import { UrgencyBadge } from '@/components/product/urgency-badge';
 import { ProductCard } from '@/components/product/product-card';
 import { WishlistButton } from '@/components/product/wishlist-button';
+import { ProductJsonLd } from '@/components/seo/product-json-ld';
+import { RecentlyViewedTracker } from '@/components/product/recently-viewed-tracker';
+import { RecentlyViewedSection } from '@/components/product/recently-viewed-section';
 import { Truck, RotateCcw, Lock } from 'lucide-react';
 
 interface Props {
@@ -42,8 +45,12 @@ export default async function ProductPage({ params }: Props) {
     : await getProducts({ first: 5 });
   const related = relatedRaw.filter((p) => p.handle !== handle).slice(0, 4);
 
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://footway-india.vercel.app';
+
   return (
     <>
+      <ProductJsonLd product={product} url={`${base}/products/${handle}`} />
+      <RecentlyViewedTracker product={product} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
@@ -123,6 +130,9 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Recently Viewed */}
+      <RecentlyViewedSection excludeHandle={handle} />
 
       {/* Related Products */}
       {related.length > 0 && (

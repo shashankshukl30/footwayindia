@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { SiteLayout } from '@/components/layout';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { OrganizationJsonLd } from '@/components/seo/organization-json-ld';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             }}
           />
         )}
+        <OrganizationJsonLd />
         <SiteLayout>{children}</SiteLayout>
         <Analytics />
         <SpeedInsights />

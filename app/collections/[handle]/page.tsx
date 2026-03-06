@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getCollection } from '@/lib/shopify';
-import { ProductCard } from '@/components/product/product-card';
+import { CollectionFilterBar } from '@/components/collection/collection-filter-bar';
 
 interface Props {
   params: Promise<{ handle: string }>;
@@ -21,7 +21,6 @@ export default async function CollectionPage({ params }: Props) {
   const collection = await getCollection(handle);
 
   const products = collection?.products.edges.map((e) => e.node) ?? [];
-
   const title = collection?.title ?? handle.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const description = collection?.description;
 
@@ -47,7 +46,7 @@ export default async function CollectionPage({ params }: Props) {
         )}
       </div>
 
-      {/* Product grid */}
+      {/* Filters + Product grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {products.length === 0 ? (
           <div className="text-center py-32">
@@ -56,16 +55,7 @@ export default async function CollectionPage({ params }: Props) {
             </p>
           </div>
         ) : (
-          <>
-            <p className="text-brand-text-muted text-[11px] tracking-[0.2em] uppercase mb-10">
-              {products.length} product{products.length !== 1 ? 's' : ''}
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </>
+          <CollectionFilterBar products={products} />
         )}
       </section>
     </>

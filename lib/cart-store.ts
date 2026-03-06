@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { toast } from 'sonner';
 import type { Cart } from './shopify/types';
 
 interface CartStore {
@@ -49,16 +50,23 @@ export const useCartStore = create<CartStore>()(
       setLoading: (loading) => set({ isLoading: loading }),
 
       addItem: async (merchandiseId, quantity = 1) => {
-        const { cartId } = get();
+        const { cartId, cart } = get();
+        // Optimistic update — immediately increment badge count
+        if (cart) {
+          set({ cart: { ...cart, totalQuantity: cart.totalQuantity + quantity } });
+        }
         set({ isLoading: true });
         try {
           const body = cartId
             ? { action: 'add', cartId, lines: [{ merchandiseId, quantity }] }
             : { action: 'create', lines: [{ merchandiseId, quantity }] };
-          const cart = await cartFetch(body);
-          set({ cart, cartId: cart.id, isOpen: true });
+          const newCart = await cartFetch(body);
+          set({ cart: newCart, cartId: newCart.id, isOpen: true });
         } catch (err) {
           console.error('addItem failed:', err);
+          // Revert optimistic update on error
+          if (cart) set({ cart });
+          toast.error('Could not add to cart', { description: 'Please try again.' });
         } finally {
           set({ isLoading: false });
         }
@@ -66,13 +74,14 @@ export const useCartStore = create<CartStore>()(
 
       updateItem: async (lineId, quantity) => {
         const { cartId } = get();
-        if (!cartId) return; // Guard BEFORE setting isLoading
+        if (!cartId) return;
         set({ isLoading: true });
         try {
           const cart = await cartFetch({ action: 'update', cartId, lineId, quantity });
           set({ cart });
         } catch (err) {
           console.error('updateItem failed:', err);
+          toast.error('Could not update cart.');
         } finally {
           set({ isLoading: false });
         }
@@ -80,13 +89,14 @@ export const useCartStore = create<CartStore>()(
 
       removeItem: async (lineId) => {
         const { cartId } = get();
-        if (!cartId) return; // Guard BEFORE setting isLoading
+        if (!cartId) return;
         set({ isLoading: true });
         try {
           const cart = await cartFetch({ action: 'remove', cartId, lineIds: [lineId] });
           set({ cart });
         } catch (err) {
           console.error('removeItem failed:', err);
+          toast.error('Could not remove item.');
         } finally {
           set({ isLoading: false });
         }

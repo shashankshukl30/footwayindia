@@ -1,10 +1,34 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { Cormorant_Garamond, Barlow_Condensed, Inter } from 'next/font/google';
+import { MotionConfig } from 'framer-motion';
 import { SiteLayout } from '@/components/layout';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { OrganizationJsonLd } from '@/components/seo/organization-json-ld';
 import './globals.css';
+
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
+  display: 'swap',
+});
+
+const barlow = Barlow_Condensed({
+  subsets: ['latin'],
+  weight: ['600', '700', '800'],
+  variable: '--font-display',
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: {
@@ -24,8 +48,22 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className={`${cormorant.variable} ${barlow.variable} ${inter.variable}`}
+    >
+      <head>
+        <link rel="preconnect" href="https://images.unsplash.com" />
+      </head>
       <body>
+        {/* Skip navigation — first focusable element for keyboard/screen reader users */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:bg-brand-gold focus:text-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium"
+        >
+          Skip to main content
+        </a>
+
         {/* Google Tag Manager — only loads when GTM ID is configured */}
         {gtmId && (
           <script
@@ -39,7 +77,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           />
         )}
         <OrganizationJsonLd />
-        <SiteLayout>{children}</SiteLayout>
+        <MotionConfig reducedMotion="user">
+          <SiteLayout>{children}</SiteLayout>
+        </MotionConfig>
         <Analytics />
         <SpeedInsights />
       </body>

@@ -15,7 +15,11 @@ const NAV_LINKS = [
   { href: '/pages/size-guide',   label: 'Size Guide' },
 ];
 
-export function Navbar() {
+interface NavbarProps {
+  onSearchOpen?: () => void;
+}
+
+export function Navbar({ onSearchOpen }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled]     = useState(false);
   const { cart, openCart }          = useCartStore();
@@ -76,13 +80,13 @@ export function Navbar() {
 
             {/* Right Icons */}
             <div className="flex items-center gap-0.5">
-              <Link
-                href="/search"
+              <button
+                onClick={() => onSearchOpen?.()}
                 className="p-2.5 text-brand-text-muted hover:text-brand-text transition-colors duration-300"
                 aria-label="Search products"
               >
                 <Search size={18} aria-hidden="true" strokeWidth={1.5} />
-              </Link>
+              </button>
 
               <Link
                 href="/wishlist"

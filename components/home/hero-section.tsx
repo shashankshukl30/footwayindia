@@ -85,6 +85,7 @@ export function HeroSection() {
               className="w-full h-full object-cover object-center opacity-70"
               style={{ animation: `${HERO_IMAGES[imageIndex]!.kb} 7s ease-out forwards` }}
               loading={imageIndex === 0 ? 'eager' : 'lazy'}
+              {...(imageIndex === 0 ? { fetchPriority: 'high' as const, decoding: 'async' } : {})}
             />
           </motion.div>
         </AnimatePresence>

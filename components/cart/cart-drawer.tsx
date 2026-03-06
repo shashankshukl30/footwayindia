@@ -1,17 +1,25 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
+import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
 import { useCartStore } from '@/lib/cart-store';
 import { formatPrice } from '@/lib/shopify';
 
+const FREE_SHIPPING_THRESHOLD = 999;
+
 export function CartDrawer() {
   const { cart, isOpen, closeCart, updateItem, removeItem, isLoading } = useCartStore();
+  const [checkingOut, setCheckingOut] = useState(false);
 
-  const lines = cart?.lines.edges.map((e) => e.node) ?? [];
+  const lines         = cart?.lines.edges.map((e) => e.node) ?? [];
   const totalQuantity = cart?.totalQuantity ?? 0;
-  const subtotal = cart?.cost.subtotalAmount;
+  const subtotal      = cart?.cost.subtotalAmount;
+  const subtotalAmt   = subtotal ? parseFloat(subtotal.amount) : 0;
+  const shippingProgress = Math.min((subtotalAmt / FREE_SHIPPING_THRESHOLD) * 100, 100);
+  const shippingRemaining = Math.max(FREE_SHIPPING_THRESHOLD - subtotalAmt, 0);
+  const currencyCode  = subtotal?.currencyCode ?? 'INR';
 
   return (
     <AnimatePresence>
@@ -143,6 +151,24 @@ export function CartDrawer() {
 
                 {/* Footer */}
                 <div className="border-t border-brand-border px-6 py-5 space-y-3 bg-brand-surface">
+
+                  {/* Free shipping progress */}
+                  <div className="mb-1">
+                    <div className="h-0.5 bg-brand-border w-full overflow-hidden rounded-full">
+                      <motion.div
+                        className="h-full bg-brand-gold rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${shippingProgress}%` }}
+                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-brand-text-muted mt-1.5">
+                      {shippingProgress >= 100
+                        ? '✓ You qualify for free shipping!'
+                        : `Add ${formatPrice(shippingRemaining.toFixed(2), currencyCode)} more for free shipping`}
+                    </p>
+                  </div>
+
                   <div className="flex justify-between text-brand-text-secondary text-sm">
                     <span>Subtotal</span>
                     <span className="font-medium text-brand-text">
@@ -156,9 +182,13 @@ export function CartDrawer() {
                   {cart?.checkoutUrl && (
                     <a
                       href={cart.checkoutUrl}
+                      onClick={() => setCheckingOut(true)}
                       className="w-full bg-brand-text text-white py-3.5 text-[11px] font-semibold uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-brand-gold transition-colors duration-300"
                     >
-                      <ShoppingBag size={15} /> Checkout
+                      {checkingOut
+                        ? <><Loader2 size={14} className="animate-spin" /> Redirecting...</>
+                        : <><ShoppingBag size={15} /> Checkout</>
+                      }
                     </a>
                   )}
                   <Link

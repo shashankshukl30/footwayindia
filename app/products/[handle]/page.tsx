@@ -9,6 +9,7 @@ import { WishlistButton } from '@/components/product/wishlist-button';
 import { ProductJsonLd } from '@/components/seo/product-json-ld';
 import { RecentlyViewedTracker } from '@/components/product/recently-viewed-tracker';
 import { RecentlyViewedSection } from '@/components/product/recently-viewed-section';
+import { Breadcrumbs } from '@/components/layout/breadcrumbs';
 import { Truck, RotateCcw, Lock } from 'lucide-react';
 
 interface Props {
@@ -63,11 +64,10 @@ export default async function ProductPage({ params }: Props) {
           {/* Right: Info + Actions */}
           <div>
             {/* Breadcrumb */}
-            <nav className="text-brand-text-muted text-[10px] uppercase tracking-[0.2em] mb-5" aria-label="Breadcrumb">
-              <span>Home</span>
-              <span className="mx-2 text-brand-border">›</span>
-              <span className="text-brand-text">{product.title}</span>
-            </nav>
+            <Breadcrumbs crumbs={[
+              { label: 'Home', href: '/' },
+              { label: product.title },
+            ]} />
 
             {/* Title + Wishlist */}
             <div className="flex items-start justify-between gap-4 mb-3">

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getCollection } from '@/lib/shopify';
 import { CollectionFilterBar } from '@/components/collection/collection-filter-bar';
+import { Breadcrumbs } from '@/components/layout/breadcrumbs';
 
 interface Props {
   params: Promise<{ handle: string }>;
@@ -48,6 +49,7 @@ export default async function CollectionPage({ params }: Props) {
 
       {/* Filters + Product grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <Breadcrumbs crumbs={[{ label: 'Home', href: '/' }, { label: title }]} />
         {products.length === 0 ? (
           <div className="text-center py-32">
             <p className="text-brand-text-muted text-[11px] tracking-[0.3em] uppercase">

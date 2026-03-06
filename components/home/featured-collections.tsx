@@ -68,14 +68,17 @@ export function FeaturedCollections() {
       </motion.div>
 
       {/* Asymmetric grid: hero card spans 2 rows on desktop */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:grid-rows-2">
-        {COLLECTIONS.map((col, i) => (
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-60px' }}
+        variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } } }}
+        className="grid grid-cols-1 md:grid-cols-2 gap-3 md:grid-rows-2"
+      >
+        {COLLECTIONS.map((col) => (
           <motion.div
             key={col.href}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ delay: i * 0.08, duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.76, 0, 0.24, 1] as [number,number,number,number] } } }}
             className={col.span ? 'md:row-span-2' : ''}
           >
             <Link
@@ -130,7 +133,7 @@ export function FeaturedCollections() {
             </Link>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 }

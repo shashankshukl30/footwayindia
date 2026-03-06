@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getProducts } from '@/lib/shopify';
 import { ProductCard } from '@/components/product/product-card';
+import { SearchForm } from '@/components/search/search-form';
 
 export const metadata: Metadata = {
   title: 'Search',
@@ -17,7 +18,6 @@ export default async function SearchPage({ searchParams }: Props) {
 
   let products = await getProducts({ first: 48, query: query || undefined });
 
-  // Client-safe sort
   if (sort === 'price-asc')  products = [...products].sort((a, b) => parseFloat(a.priceRange.minVariantPrice.amount) - parseFloat(b.priceRange.minVariantPrice.amount));
   if (sort === 'price-desc') products = [...products].sort((a, b) => parseFloat(b.priceRange.minVariantPrice.amount) - parseFloat(a.priceRange.minVariantPrice.amount));
 
@@ -37,39 +37,8 @@ export default async function SearchPage({ searchParams }: Props) {
         </div>
       </div>
 
-      {/* Search + sort bar */}
-      <form method="GET" className="flex flex-col sm:flex-row gap-3 mb-10">
-        <div className="flex flex-1 gap-3 max-w-lg">
-          <input
-            type="search"
-            name="q"
-            defaultValue={query}
-            placeholder="Search sneakers, boots, sandals..."
-            className="flex-1 bg-brand-surface border border-brand-border text-brand-text placeholder:text-brand-text-muted px-4 py-3 text-sm focus:outline-none focus:border-brand-text transition-colors"
-            aria-label="Search products"
-          />
-          <button
-            type="submit"
-            className="bg-brand-text text-white px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.2em] hover:bg-brand-gold transition-colors duration-300 flex-shrink-0"
-          >
-            Search
-          </button>
-        </div>
-        <select
-          name="sort"
-          defaultValue={sort ?? ''}
-          onChange={(e) => {
-            const form = e.currentTarget.closest('form') as HTMLFormElement;
-            form?.requestSubmit?.();
-          }}
-          className="bg-brand-surface border border-brand-border text-brand-text-secondary text-sm px-4 py-3 focus:outline-none focus:border-brand-text transition-colors"
-          aria-label="Sort products"
-        >
-          <option value="">Sort: Default</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-        </select>
-      </form>
+      {/* Search + sort bar — client component (event handlers) */}
+      <SearchForm query={query} sort={sort ?? ''} />
 
       {/* Results */}
       {products.length === 0 ? (

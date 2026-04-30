@@ -30,17 +30,30 @@ const inter = Inter({
   display: 'swap',
 });
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://footway-india.vercel.app';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
   title: {
     default: 'Footway India — Premium Footwear',
     template: '%s | Footway India',
   },
   description: "Premium footwear for those who refuse to settle. Crafted for comfort, designed for impact. Shop Men's, Women's, and Kids footwear.",
   keywords: ['footwear', 'shoes', 'sneakers', 'premium shoes', 'India', 'men shoes', 'women shoes', 'kids shoes'],
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
   openGraph: {
     siteName: 'Footway India',
     type: 'website',
     locale: 'en_IN',
+    url: BASE_URL,
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Footway India — Premium Footwear' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/opengraph-image'],
   },
 };
 

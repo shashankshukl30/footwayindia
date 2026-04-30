@@ -80,9 +80,10 @@ export function Navbar({ onSearchOpen }: NavbarProps) {
 
             {/* Right Icons */}
             <div className="flex items-center gap-0.5">
+              {/* Desktop-only icons — on mobile these live in the bottom nav */}
               <button
                 onClick={() => onSearchOpen?.()}
-                className="p-2.5 text-brand-text-muted hover:text-brand-text transition-colors duration-300"
+                className="hidden md:block p-2.5 text-brand-text-muted hover:text-brand-text transition-colors duration-300"
                 aria-label="Search products"
               >
                 <Search size={18} aria-hidden="true" strokeWidth={1.5} />
@@ -90,7 +91,7 @@ export function Navbar({ onSearchOpen }: NavbarProps) {
 
               <Link
                 href="/wishlist"
-                className="p-2.5 text-brand-text-muted hover:text-brand-gold transition-colors duration-300"
+                className="hidden md:block p-2.5 text-brand-text-muted hover:text-brand-gold transition-colors duration-300"
                 aria-label="Wishlist"
               >
                 <Heart size={18} aria-hidden="true" strokeWidth={1.5} />
@@ -98,7 +99,7 @@ export function Navbar({ onSearchOpen }: NavbarProps) {
 
               <Link
                 href="/account"
-                className="p-2.5 text-brand-text-muted hover:text-brand-text transition-colors duration-300"
+                className="hidden md:block p-2.5 text-brand-text-muted hover:text-brand-text transition-colors duration-300"
                 aria-label="Account"
               >
                 {userInitial ? (
@@ -110,10 +111,10 @@ export function Navbar({ onSearchOpen }: NavbarProps) {
                 )}
               </Link>
 
-              {/* Cart — opens drawer */}
+              {/* Cart — opens drawer (desktop only; mobile has bottom nav) */}
               <button
                 onClick={openCart}
-                className="relative p-2.5 text-brand-text-muted hover:text-brand-text transition-colors duration-300"
+                className="relative hidden md:block p-2.5 text-brand-text-muted hover:text-brand-text transition-colors duration-300"
                 aria-label={`Shopping cart${totalQuantity > 0 ? `, ${totalQuantity} items` : ''}`}
               >
                 <ShoppingBag size={18} aria-hidden="true" strokeWidth={1.5} />

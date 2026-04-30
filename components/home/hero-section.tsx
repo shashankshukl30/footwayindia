@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Tag } from 'lucide-react';
@@ -39,11 +39,24 @@ export function HeroSection() {
   const [wordIndex,  setWordIndex]  = useState(0);
   const [imageIndex, setImageIndex] = useState(0);
   const [mounted,    setMounted]    = useState(false);
-  const [paused,     setPaused]     = useState(false);
+  const [visible,    setVisible]    = useState(true);
+  const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 100);
     return () => clearTimeout(t);
+  }, []);
+
+  // Pause slideshow when hero scrolls out of view, resume when back
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(entry!.isIntersecting),
+      { threshold: 0.1 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -52,18 +65,17 @@ export function HeroSection() {
   }, []);
 
   useEffect(() => {
-    if (paused) return;
+    if (!visible) return;
     const t = setInterval(() => setImageIndex((i) => (i + 1) % HERO_IMAGES.length), SLIDE_DURATION);
     return () => clearInterval(t);
-  }, [paused]);
+  }, [visible]);
 
   const goTo = useCallback((i: number) => setImageIndex(i), []);
 
   return (
     <section
+      ref={heroRef}
       className="relative w-full min-h-[95vh] flex items-end overflow-hidden bg-brand-bg pb-16 md:pb-20"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
     >
 
       {/* ── Slideshow images ── */}
@@ -194,18 +206,18 @@ export function HeroSection() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.75, duration: 0.5 }}
-                className="flex flex-wrap gap-3"
+                className="flex flex-col sm:flex-row gap-3"
               >
                 <Link
                   href="/collections/mens"
-                  className="group inline-flex items-center gap-3 bg-brand-text text-white px-7 py-3.5 text-[11px] font-semibold tracking-[0.2em] uppercase hover:bg-brand-gold transition-colors duration-300"
+                  className="group inline-flex items-center justify-center gap-3 bg-brand-text text-white px-7 py-3.5 text-[11px] font-semibold tracking-[0.2em] uppercase hover:bg-brand-gold transition-colors duration-300 w-full sm:w-auto"
                 >
                   Shop Men&apos;s
                   <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-300" aria-hidden="true" />
                 </Link>
                 <Link
                   href="/collections/womens"
-                  className="inline-flex items-center gap-3 border border-brand-border text-brand-text px-7 py-3.5 text-[11px] font-medium tracking-[0.2em] uppercase hover:border-brand-text hover:bg-brand-text hover:text-white transition-all duration-300"
+                  className="inline-flex items-center justify-center gap-3 border border-brand-border text-brand-text px-7 py-3.5 text-[11px] font-medium tracking-[0.2em] uppercase hover:border-brand-text hover:bg-brand-text hover:text-white transition-all duration-300 w-full sm:w-auto"
                 >
                   Shop Women&apos;s
                 </Link>
